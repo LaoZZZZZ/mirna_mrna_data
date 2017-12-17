@@ -1,0 +1,29 @@
+
+#Load miRCausality. The following command is for loading the miRCausality file from my PC.
+#You should replace the path to where you save the miRcausality.R
+
+source("C:/Users/leyty017/Documents/CausalREG/R-code/miRCausality.R")
+
+#Load data. Prepare the dataset in csv format and save it into the R working directory. In the 
+#dataset, the first column is the sample names and the first row is the probe names. The data must 
+#be in order, all miRNAs and then all mRNAs. For example, assume that we have 2 miRNAs and 3
+#mRNAs. The first column is for the sample names, so the next 2 columns is for miRNAs and the last 
+#3 columns for mRNAs.
+
+dt<-Read("Dataset-mir-mr-new 43.csv")
+
+#standardise data
+ stdData<-Standardise(dt)
+
+#Bootstrapping. stdData is the standardised data. 100 is the number of bootstrap, you can change this number
+#0.01 is the tuning parameter for the PC algorithm. 43 is the number of the miRNAs in the dataset.
+
+bootstrapresultsNew43<-bootstr(stdData, 100, 0.01, 43)
+write.table(bootstrapresultsNew43, "bootstrapresultsNew43.txt", sep=",")
+
+#Take median of 100 bootstraps
+library(WGCNA)
+FinalResult43<-do.call(pmedian, bootstrapresultsNew43)
+
+#Output the results
+write.table(FinalResult43, "Finalresult43.txt", sep=",")
